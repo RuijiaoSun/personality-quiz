@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personality Quiz</title>
+    <style>
+        /* CSS: Making it look clean and modern */
+        body { font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; background-color: #f4f7f6; }
+        #quiz-card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; }
+        .option-btn { display: block; width: 100%; margin: 10px 0; padding: 12px; border: 2px solid #007bff; border-radius: 8px; background: white; cursor: pointer; transition: 0.3s; font-size: 16px; }
+        .option-btn:hover { background: #007bff; color: white; }
+        #result-area { display: none; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="quiz-card">
+    <div style="background: #eee; border-radius: 10px; height: 10px; margin-bottom: 20px;">
+     <div id="progress-bar" style="background: #007bff; width: 0%; height: 100%; border-radius: 10px; transition: 0.3s;"></div>
+    </div>
+    <div id="quiz-content">
+        <h2 id="question-text">Loading question...</h2>
+        <div id="options-container"></div>
+    </div>
+
+    <div id="result-area">
+        <h1>You are: <span id="personality-type"></span></h1>
+        <p id="personality-desc"></p>
+        <button class="option-btn" onclick="location.reload()">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    // JAVASCRIPT: The Logic
+    const questions = [
+        {
+            text: "How do you recharge after a long week?",
+            options: [
+                { text: "Going out with a large group of friends", trait: "extrovert" },
+                { text: "Watching a movie alone or with a close friend", trait: "introvert" }
+            ]
+        },
+	{
+    	text: "Which environment do you prefer for deep work?",
+    	options: [
+        	{ text: "A bustling coffee shop", trait: "extrovert" },
+        	{ text: "A library or home office", trait: "introvert" }
+  	  ]
+	},
+        {
+            text: "In a meeting, you are usually the one who:",
+            options: [
+                { text: "Speaks up immediately with ideas", trait: "extrovert" },
+                { text: "Listens first and speaks later", trait: "introvert" }
+            ]
+        },
+        {
+            text: "When starting a project, you prefer:",
+            options: [
+                { text: "Collaborating with a big team", trait: "extrovert" },
+                { text: "Working independently in a quiet space", trait: "introvert" }
+            ]
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let scores = { introvert: 0, extrovert: 0 };
+
+    function loadQuestion() {
+        const progress = (currentQuestionIndex / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = progress + '%';
+        const currentQuestion = questions[currentQuestionIndex];
+        document.getElementById('question-text').innerText = currentQuestion.text;
+        const container = document.getElementById('options-container');
+        container.innerHTML = ''; // Clear old buttons
+
+        currentQuestion.options.forEach(option => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = option.text;
+            btn.onclick = () => handleAnswer(option.trait);
+            container.appendChild(btn);
+        });
+    }
+
+    function handleAnswer(trait) {
+    	scores[trait]++;
+    	currentQuestionIndex++;
+	
+    	// Update progress bar here so it reacts to the click
+    	const progress = (currentQuestionIndex / questions.length) * 100;
+   	 document.getElementById('progress-bar').style.width = progress + '%';
+	
+    	if (currentQuestionIndex < questions.length) {
+        	// Small delay so the user sees the bar move before the next question appears
+        	setTimeout(loadQuestion, 200); 
+    	} else {
+        	// Small delay so the user sees the bar hit 100% before results show
+        	setTimeout(showResults, 500);
+    	}
+    }
+
+    function showResults() {
+        document.getElementById('quiz-content').classList.add('hidden');
+        const resultArea = document.getElementById('result-area');
+        const typeSpan = document.getElementById('personality-type');
+        const descP = document.getElementById('personality-desc');
+
+        const winner = scores.extrovert > scores.introvert ? "The Social Butterfly (Extrovert)" : "The Focused Observer (Introvert)";
+        const desc = scores.extrovert > scores.introvert ? 
+            "You gain energy from social interactions and love being where the action is!" : 
+            "You prefer deep focus and recharge best in quiet, thoughtful environments.";
+
+        typeSpan.innerText = winner;
+        descP.innerText = desc;
+        resultArea.style.display = 'block';
+    }
+
+    // Start the quiz
+    loadQuestion();
+</script>
+
+</body>
+</html>
